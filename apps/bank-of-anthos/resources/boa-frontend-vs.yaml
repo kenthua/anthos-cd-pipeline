@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: frontend
+spec:
+  gateways:
+  - boa-gateway
+  hosts:
+  - "*"
+  http:
+  - route:
+    - destination:
+        host: frontend
+        port:
+          number: 80

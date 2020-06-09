@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../resources
+
+patchesJson6902:
+- path: bookinfo-vs-patch.yaml
+  target:
+    group: networking.istio.io
+    kind: VirtualService
+    name: bookinfo
+    version: v1alpha3
+- path: bookinfo-gateway-patch.yaml
+  target:
+    group: networking.istio.io
+    kind: Gateway
+    name: bookinfo-gateway
+    version: v1alpha3
+namespace: bookinfo

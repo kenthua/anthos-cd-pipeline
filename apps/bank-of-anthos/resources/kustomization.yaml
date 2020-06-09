@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+#- github.com/GoogleCloudPlatform/bank-of-anthos/kubernetes-manifests?ref=master
+resources:
+- boa-namespace.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/accounts-db.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/balance-reader.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/config.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/contacts.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/frontend.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/ledger-db.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/ledger-writer.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/loadgenerator.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/transaction-history.yaml
+- https://raw.githubusercontent.com/kenthua/bank-of-anthos/multicluster/kubernetes-manifests/userservice.yaml
+- boa-frontend-vs.yaml
+- boa-gateway.yaml
+secretGenerator:
+- files:
+  - jwtRS256.key
+  - jwtRS256.key.pub
+  name: jwt-key
+  type: Opaque
+namespace: boa

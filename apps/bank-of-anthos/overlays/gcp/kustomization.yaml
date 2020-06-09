@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+#- github.com/GoogleCloudPlatform/bank-of-anthos/kubernetes-manifests?ref=master
+resources:
+- ../../resources
+patchesJson6902:
+- path: frontend-service-patch.yaml
+  target:
+    kind: Service
+    name: frontend
+    version: v1
+- target:
+    group: networking.istio.io
+    version: v1alpha3
+    kind: VirtualService
+    name: frontend
+  path: frontend-vs-patch.yaml
+- target:
+    group: networking.istio.io
+    version: v1alpha3
+    kind: Gateway
+    name: boa-gateway
+  path: boa-gateway-patch.yaml
+namespace: boa
