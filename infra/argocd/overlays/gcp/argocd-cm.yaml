@@ -1,0 +1,25 @@
+apiVersion: v1
+data:
+  repositories: |
+    - name: github
+      type: git
+      url: https://github.com/kenthua/anthos-cd-pipeline
+  # Configuration to customize resource behavior (optional). Keys are in the form: group/Kind.
+  resource.customizations: |
+    admissionregistration.k8s.io/MutatingWebhookConfiguration:
+      # List of json pointers in the object to ignore differences
+      ignoreDifferences: |
+        jsonPointers:
+        - /webhooks/0/clientConfig/caBundle
+    admissionregistration.k8s.io/ValidatingWebhookConfiguration:
+      # List of json pointers in the object to ignore differences
+      ignoreDifferences: |
+        jsonPointers:
+        - /webhooks/0/clientConfig/caBundle
+        - /webhooks/0/failurePolicy
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+  name: argocd-cm
