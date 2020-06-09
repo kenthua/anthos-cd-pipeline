@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hipster
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/kenthua/anthos-cd-pipeline'
+    path: apps/hipster/overlays/gcp
+    targetRevision: master
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  syncPolicy:
+    automated:
+      selfHeal: true
