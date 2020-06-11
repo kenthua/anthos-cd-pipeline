@@ -51,7 +51,7 @@ Argocd is configured in `infra` to automatically pipeline deploy `argocd-platfor
     ```
 
 ## App Specific
-- Bank of Anthos - This configuration will deploy ledger db services in cluster1 and accounts db services in cluster2
+- Bank of Anthos
   - Generate RSA key pair in mc/resources
 
     ```shell

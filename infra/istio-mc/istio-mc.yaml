@@ -1,0 +1,209 @@
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+
+  addonComponents:
+    istiocoredns:
+      enabled: true
+    tracing:
+      enabled: true
+    prometheus:
+      enabled: true
+      k8s:
+        replicaCount: 1
+  components:
+    egressGateways:
+      - name: istio-egressgateway
+        enabled: true
+
+    # Policy feature
+    policy:
+      enabled: false
+      k8s:
+        hpaSpec:
+          maxReplicas: 5
+          minReplicas: 1
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: istio-policy
+          metrics:
+            - type: Resource
+              resource:
+                name: cpu
+                targetAverageUtilization: 80
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+        strategy:
+          rollingUpdate:
+            maxSurge: "100%"
+            maxUnavailable: "25%"
+
+    # Telemetry feature
+    telemetry:
+      enabled: false
+      k8s:
+        env:
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: GOMAXPROCS
+            value: "6"
+        hpaSpec:
+          maxReplicas: 5
+          minReplicas: 1
+          scaleTargetRef:
+            apiVersion: apps/v1
+            kind: Deployment
+            name: istio-telemetry
+          metrics:
+            - type: Resource
+              resource:
+                name: cpu
+                targetAverageUtilization: 80
+        replicaCount: 1
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 1G
+          limits:
+            cpu: 4800m
+            memory: 4G
+        strategy:
+          rollingUpdate:
+            maxSurge: "100%"
+            maxUnavailable: "25%"
+
+
+  values:
+    global:
+      # Provides dns resolution for global services
+      podDNSSearchNamespaces:
+        - global
+        - "{{ valueOrDefault .DeploymentMeta.Namespace \"default\" }}.global"
+
+      multiCluster:
+        enabled: true
+
+      controlPlaneSecurityEnabled: true
+
+    # Multicluster with gateways requires a root CA
+    # Cluster local CAs are bootstrapped with the root CA.
+    security:
+      selfSigned: false
+
+    telemetry:
+      enabled: true
+      v1:
+        enabled: false
+      v2:
+        enabled: true
+        metadataExchange: {}
+        prometheus:
+          enabled: true
+        stackdriver:
+          enabled: true
+          logging: true
+          monitoring: true
+          topology: true
+          configOverride: {}
+    mixer:
+      adapters:
+        stdio:
+          enabled: false
+          outputAsJson: false
+        prometheus:
+          enabled: true
+          metricsExpiryDuration: 10m
+        kubernetesenv:
+          enabled: true
+        stackdriver:
+          enabled: true
+          auth:
+            appCredentials: false
+            apiKey: ""
+            serviceAccountPath: ""
+          tracer:
+            enabled: true
+            sampleProbability: 1
+        useAdapterCRDs: true
+
+      telemetry:
+        image: mixer
+        replicaCount: 1
+        autoscaleEnabled: true
+        sessionAffinityEnabled: false
+        loadshedding:
+          mode: enforce
+          latencyThreshold: 100ms
+        env:
+          GOMAXPROCS: "6"
+        nodeSelector: {}
+        tolerations: []
+        podAntiAffinityLabelSelector: []
+        podAntiAffinityTermLabelSelector: []
+
+      policy:
+        autoscaleEnabled: true
+        image: mixer
+        sessionAffinityEnabled: false
+        adapters:
+          kubernetesenv:
+            enabled: true
+          useAdapterCRDs: false
+
+    tracing:
+      provider: jaeger
+      nodeSelector: {}
+      podAntiAffinityLabelSelector: []
+      podAntiAffinityTermLabelSelector: []
+      jaeger:
+        hub: docker.io/jaegertracing
+        tag: "1.16"
+        memory:
+          max_traces: 50000
+        spanStorageType: badger
+        persist: false
+        storageClassName: ""
+        accessMode: ReadWriteMany
+      zipkin:
+        hub: docker.io/openzipkin
+        tag: 2.20.0
+        probeStartupDelay: 10
+        queryPort: 9411
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2048Mi
+          requests:
+            cpu: 150m
+            memory: 900Mi
+        javaOptsHeap: 700
+        maxSpans: 500000
+        node:
+          cpus: 2
+      opencensus:
+        hub: docker.io/omnition
+        tag: 0.1.9
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 400Mi
+        exporters:
+          stackdriver:
+            enable_tracing: true
+
+    gateways:
+      istio-egressgateway:
+        env:
+          # Needed to route traffic via egress gateway if desired.
+          ISTIO_META_REQUESTED_NETWORK_VIEW: "external"
