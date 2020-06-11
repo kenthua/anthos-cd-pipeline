@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- hipster-namespace.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/cartservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/redis.yaml
+
+images:
+- name: cartservice
+  newName: gcr.io/google-samples/microservices-demo/cartservice
+  newTag: v0.2.0
+- name: redis
+  newName: redis
+  newTag: alpine
+namespace: hipster

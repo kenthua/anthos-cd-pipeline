@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: cartservice-hipster
+spec:
+  hosts:
+  # must be of form name.namespace.global
+  - cartservice.hipster.global
+  # Treat remote cluster services as part of the service mesh
+  # as all clusters in the service mesh share the same root of trust.
+  location: MESH_INTERNAL
+  ports:
+  - name: grpc
+    number: 7070
+    protocol: grpc
+  resolution: DNS
+  addresses:
+  - 240.0.0.3
+  endpoints:
+  - address: 127.0.0.1
+    ports:
+      grpc: 15443 # Do not change this port value

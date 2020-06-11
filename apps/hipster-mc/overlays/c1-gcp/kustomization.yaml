@@ -1,0 +1,61 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- hipster-namespace.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/adservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/checkoutservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/currencyservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/emailservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/frontend.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/loadgenerator.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/paymentservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/productcatalogservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/recommendationservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/kubernetes-manifests/shippingservice.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/istio-manifests/frontend-gateway.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/istio-manifests/frontend.yaml
+- https://raw.githubusercontent.com/GoogleCloudPlatform/microservices-demo/master/istio-manifests/whitelist-egress-googleapis.yaml
+- cartservice.yaml
+- cartservice-vs.yaml
+- cartservice-se.yaml
+
+patchesJson6902:
+- path: serviceentry-patch.yaml
+  target:
+    group: networking.istio.io
+    kind: ServiceEntry
+    name: cartservice-hipster
+    version: v1alpha3
+
+images:
+- name: emailservice
+  newName: gcr.io/google-samples/microservices-demo/emailservice
+  newTag: v0.2.0
+- name: checkoutservice
+  newName: gcr.io/google-samples/microservices-demo/checkoutservice
+  newTag: v0.2.0
+- name: recommendationservice
+  newName: gcr.io/google-samples/microservices-demo/recommendationservice
+  newTag: v0.2.0
+- name: frontend
+  newName: gcr.io/google-samples/microservices-demo/frontend
+  newTag: v0.2.0
+- name: paymentservice
+  newName: gcr.io/google-samples/microservices-demo/paymentservice
+  newTag: v0.2.0
+- name: productcatalogservice
+  newName: gcr.io/google-samples/microservices-demo/productcatalogservice
+  newTag: v0.2.0
+- name: loadgenerator
+  newName: gcr.io/google-samples/microservices-demo/loadgenerator
+  newTag: v0.2.0
+- name: currencyservice
+  newName: gcr.io/google-samples/microservices-demo/currencyservice
+  newTag: v0.2.0
+- name: shippingservice
+  newName: gcr.io/google-samples/microservices-demo/shippingservice
+  newTag: v0.2.0
+- name: adservice
+  newName: gcr.io/google-samples/microservices-demo/adservice
+  newTag: v0.2.0
+namespace: hipster
