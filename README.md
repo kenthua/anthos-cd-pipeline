@@ -6,10 +6,12 @@
 - [Bookinfo](https://istio.io/latest/docs/examples/bookinfo/) (istio)
 - Bank of Anthos multi-cluster
   - cluster 1 (gcp) - balancer-reader, frontend, ledger-db, ledger-writer, loadgenerator, transaction-history
-  - cluster 2 (aws) - accounts-db, contacts, user-service
+  - cluster 2 (aws/X) - accounts-db, contacts, user-service
 - Hipster Shop multi-cluster
   - cluster 1 (gcp) - adservice, checkoutservice, currencyservice, emailservice, frontend, loadgenerator, paymentservice, productcatalogservice, recommendationservice, shippingservice
-  - cluster 2 (aws) - cartservice, redis
+  - cluster 2 (aws/X) - cartservice, redis
+
+NOTE: cluster does not have to be Anthos GKE on AWS
 
 ## argocd
 Argocd is configured in `infra` to automatically pipeline deploy `argocd-platform`, `bank of anthos`, `hipster shop`, and `bookinfo`.
