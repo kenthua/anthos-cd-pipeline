@@ -11,12 +11,13 @@
   - cluster 1 (gcp) - adservice, checkoutservice, currencyservice, emailservice, frontend, loadgenerator, paymentservice, productcatalogservice, recommendationservice, shippingservice
   - cluster 2 (aws/X) - cartservice, redis
 
-NOTE: cluster does not have to be Anthos GKE on AWS
+> NOTE: cluster does not have to be Anthos GKE on AWS
 
 ## argocd
 Argocd is configured in `infra` to automatically pipeline deploy `argocd-platform`, `bank of anthos`, `hipster shop`, and `bookinfo`.
 
-## Multi-cluster deployment, based on [istio replicated control planes](https://istio.io/docs/setup/install/multicluster/gateways/) - Tested with ASM 1.5.4
+## Multi-cluster deployment, based on [istio replicated control planes](https://istio.io/docs/setup/install/multicluster/gateways/)
+> NOTE: Tested with ASM 1.5.4
 - Istio
   - Setup shared istio certificates
 
