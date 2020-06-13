@@ -36,7 +36,9 @@ Argocd is configured in `infra` to automatically pipeline deploy `argocd-platfor
     ```shell
     # cluster 1 (gcp) in infra/istio
     # this istio is also setup to send metrics to cloud monitoring
-    # NOTE: if workload identity is enabled in the cluster, metrics won't work.
+    # NOTE: if workload identity is enabled in the cluster:
+    #   Each deployment service account will need the iam policy binding to namespace/KSA
+    #   Each KSA will need to be annotated with the GSA
     istioctl manifest apply -f istio-mc.yaml
 
     # cluster 2 (aws) in infra/istio
