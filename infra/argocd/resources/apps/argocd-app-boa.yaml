@@ -11,12 +11,12 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: default
-  # ignoreDifferences:
-  # - group: ""
-  #   kind: Namespace
-  #   version: v1
-  #   jsonPointers:
-  #   - /metadata/annotations    
-  # syncPolicy:
-  #   automated:
-  #     selfHeal: true
+  ignoreDifferences:
+  - kind: Namespace
+    version: v1
+    jsonPointers:
+    - /metadata/annotations
+    - /metadata/labels
+  syncPolicy:
+    automated:
+      selfHeal: true
