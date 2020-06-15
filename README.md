@@ -17,7 +17,7 @@
 Argocd is configured in `infra` to automatically pipeline deploy `argocd-platform`, `bank of anthos`, `hipster shop`, and `bookinfo`.
 
 ## Multi-cluster deployment, based on [istio replicated control planes](https://istio.io/docs/setup/install/multicluster/gateways/)
-> NOTE: Tested with ASM 1.5.4
+> NOTE: Tested with ASM 1.5.4, 1.5.5
 - Istio
   - Setup shared istio certificates
 
@@ -39,6 +39,7 @@ Argocd is configured in `infra` to automatically pipeline deploy `argocd-platfor
     # NOTE: if workload identity is enabled in the cluster:
     #   Each deployment service account will need the iam policy binding to namespace/KSA
     #   Each KSA will need to be annotated with the GSA
+    #   See below under workload identity section
     istioctl manifest apply -f istio-mc.yaml
 
     # cluster 2 (aws) in infra/istio
@@ -77,3 +78,48 @@ Argocd is configured in `infra` to automatically pipeline deploy `argocd-platfor
     ```shell
     kustomize build | kubectl apply -f -
     ```
+
+## Workload Identity
+- Create the role and assign permissions
+
+  ```shell
+  PROJECT_ID=<your_project_id>
+  GSA_NAME=<your_google_service_account_name | i.e. telemetry>
+  KSA_NAME=<kubernets service account | i.e. default>
+  K8S_NAMESPACE=<kubernetes namespace | i.e hipster>
+
+  # derive from above settings
+  GSA=$GSA_NAME@$PROJECT_ID.iam.gserviceaccount.com
+
+  # create the service account
+  gcloud iam service-accounts create $GSA_NAME
+
+  # assign the context graph role
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --role roles/contextgraph.asserter \
+  --member "serviceAccount:$GSA"
+
+  # assign log writer
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --role roles/logging.logWriter \
+  --member "serviceAccount:$GSA"
+
+  # assign metric writer
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+  --role roles/monitoring.metricWriter \
+  --member "serviceAccount:$GSA"
+  ```
+
+- Map GSA to KSA for Workload Identity
+  ```shell
+  # assign workload identity mapping to kubernetes resources
+  gcloud iam service-accounts add-iam-policy-binding $GSA \
+  --role roles/iam.workloadIdentityUser \
+  --member "serviceAccount:$PROJECT_ID.svc.id.goog[$K8S_NAMESPACE/$KSA_NAME]"
+
+  # annotate ksa with gsa for workload identity
+  kubectl annotate serviceaccount \
+  --namespace $K8S_NAMESPACE \
+  $KSA_NAME \
+  iam.gke.io/gcp-service-account=$GSA
+  ```
