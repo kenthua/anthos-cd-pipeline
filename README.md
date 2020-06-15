@@ -65,6 +65,9 @@ Argocd is configured in `infra` to automatically pipeline deploy `argocd-platfor
     openssl rsa -in jwtRS256.key -outform PEM -pubout -out jwtRS256.key.pub
     ```
 
+- Istio Gateway / VirtualService host
+  - In each Application, `bank of anthos`, `hipster`, and `bookinfo`, there are specific `*-patch.yaml` resources in `$APP/overlays/gcp`.  Each resource points to a specific host entry, these may need to be modified to support your environment.  You will need individual DNS or wildcard DNS entries pointing to the `istio-ingressgateway` load balancer IP.
+
 - Multi-cluster - Bank of Anthos / Hipster 
   - Modify `$APP-mc/overlays/c1-gcp` with appropriate remote ingress gateway address
 
