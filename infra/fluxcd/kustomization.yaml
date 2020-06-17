@@ -1,0 +1,17 @@
+namespace: flux
+bases:
+  - github.com/fluxcd/flux//deploy
+patchesStrategicMerge:
+  - flux-deployment-patch.yaml
+patchesJson6902:
+- path: namespace-patch.yaml
+  target:
+    kind: Namespace
+    name: flux
+    version: v1
+# to support kustomize 3.6.1, need pre-release, 1.19 is still 3.5.4 of kustomize
+images:
+- name: docker.io/fluxcd/flux
+  newName: docker.io/fluxcd/flux-prerelease
+  newTag: master-c02b716f
+

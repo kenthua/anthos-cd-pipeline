@@ -17,6 +17,3 @@ spec:
     jsonPointers:
     - /metadata/annotations
     - /metadata/labels
-  syncPolicy:
-    automated:
-      selfHeal: true

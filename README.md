@@ -14,10 +14,13 @@
 > NOTE: cluster does not have to be Anthos GKE on AWS
 
 ## argocd
-Argocd is configured in `infra` to automatically pipeline deploy `argocd-platform`, `bank of anthos`, `hipster shop`, and `bookinfo`.
+Argocd is configured in `infra` to automatically pipeline deploy `argocd-platform`, `bank of anthos`, and `hipster shop`.  `Bookinfo` is deployed, but automatic sync is disabled in favor of fluxcd in this example.
+
+## fluxcd
+Fluxcd is configured in `infra` to automatically pipeline deploy `bookinfo`.
 
 ## Multi-cluster deployment, based on [istio replicated control planes](https://istio.io/docs/setup/install/multicluster/gateways/)
-> NOTE: Tested with ASM 1.5.4, 1.5.5
+> NOTE: Tested with ASM binary 1.5.4, 1.5.5
 - Istio
   - Setup shared istio certificates
 
