@@ -19,6 +19,9 @@ Argocd is configured in `infra` to automatically pipeline deploy `argocd-platfor
 ## fluxcd
 Fluxcd is configured in `infra` to automatically pipeline deploy `bookinfo`.
 
+## tektoncd
+Tektoncd is configured in `infra` to run a TaskRun which modifies the gateway and virtualservice of `bookinfo` and apply it to a branch `gcp`, of your repo.
+
 ## Multi-cluster deployment, based on [istio replicated control planes](https://istio.io/docs/setup/install/multicluster/gateways/)
 > NOTE: Tested with ASM binary 1.5.4, 1.5.5
 - Istio
