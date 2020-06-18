@@ -31,6 +31,8 @@ spec:
     type: string
   - name: git-user-email
     type: string
+  - name: git-branch
+    type: string
   steps:
   - name: show-repo-clone
     image: golang:1.14-alpine
@@ -70,10 +72,10 @@ spec:
       cd /workspace/repo
       git config user.email "$(inputs.params.git-user-email)"
       git config user.name "$(inputs.params.git-user-name)"
-      git checkout -b gcp
+      git checkout -b $(inputs.params.git-branch)
       git add /workspace/repo/apps/$(inputs.params.app)/overlays/gcp/*.yaml
       git commit -m 'tekton pipeline'
-      git push origin gcp --force
+      git push origin $(inputs.params.git-branch) --force
 ---
 apiVersion: tekton.dev/v1beta1
 kind: TaskRun
@@ -96,6 +98,8 @@ spec:
     value: "name here"
   - name: git-user-email
     value: "email here"
+  - name: git-branch
+    value: gcp
   resources:
     inputs:
     - name: repo
