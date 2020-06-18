@@ -80,6 +80,7 @@ Fluxcd is configured in `infra` to automatically pipeline deploy `bookinfo`.
     ```
 
   - Deploy each folder `$APP-mc/overlays/c1-gcp` & `$APP-mc/overlays/c2-aws` to their respective clusters
+    > NOTE: kustomize 3.6.1+ is needed to use remote resources as http
 
     ```shell
     kustomize build | kubectl apply -f -
