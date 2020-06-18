@@ -1,3 +1,3 @@
 - op: replace
   path: /spec/servers/0/hosts/0
-  value: "*.apps.standalone.kenthua.joonix.net"
+  value: "*"
