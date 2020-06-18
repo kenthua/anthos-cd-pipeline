@@ -1,6 +1,8 @@
 # Automated Pipeline for Sample Applications
 
 ## Sample Apps
+Sample apps are from their respective sources.
+
 - [Bank of Anthos](https://github.com/GoogleCloudPlatform/bank-of-anthos)
 - [Hipster Shop](https://github.com/GoogleCloudPlatform/microservices-demo)
 - [Bookinfo](https://istio.io/latest/docs/examples/bookinfo/) (istio)
@@ -133,3 +135,7 @@ Tektoncd is configured in `infra` to run a TaskRun which modifies the gateway an
   $KSA_NAME \
   iam.gke.io/gcp-service-account=$GSA
   ```
+
+---
+
+This is not an official Google project
