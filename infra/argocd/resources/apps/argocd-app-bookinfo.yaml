@@ -7,7 +7,7 @@ spec:
   source:
     repoURL: 'https://github.com/kenthua/anthos-cd-pipeline'
     path: apps/bookinfo/overlays/gcp
-    targetRevision: master
+    targetRevision: gcp
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: default
