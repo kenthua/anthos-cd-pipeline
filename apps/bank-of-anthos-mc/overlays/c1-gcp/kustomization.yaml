@@ -34,4 +34,16 @@ patchesJson6902:
     kind: ServiceEntry
     name: contacts-boa
   path: serviceentry-patch.yaml
+- path: frontend-gateway-patch.yaml
+  target:
+    group: networking.istio.io
+    kind: Gateway
+    name: frontend-gateway
+    version: v1alpha3
+- path: frontend-vs-patch.yaml
+  target:
+    group: networking.istio.io
+    kind: VirtualService
+    name: frontend
+    version: v1alpha3      
 namespace: boa

@@ -26,6 +26,24 @@ patchesJson6902:
     kind: ServiceEntry
     name: cartservice-hipster
     version: v1alpha3
+- path: frontend-vs-patch.yaml
+  target:
+    group: networking.istio.io
+    kind: VirtualService
+    name: frontend
+    version: v1alpha3
+- path: frontend-gateway-patch.yaml
+  target:
+    group: networking.istio.io
+    kind: Gateway
+    name: frontend-gateway
+    version: v1alpha3
+- path: frontend-ingress-vs-patch.yaml
+  target:
+    group: networking.istio.io
+    kind: VirtualService
+    name: frontend-ingress
+    version: v1alpha3    
 
 images:
 - name: emailservice
