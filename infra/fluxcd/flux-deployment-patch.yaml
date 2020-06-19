@@ -12,7 +12,6 @@ spec:
             - --manifest-generation=true
             - --memcached-hostname=memcached.flux
             - --memcached-service
-            - --k8s-secret-name=git-creds
             - --git-branch=main
             - --git-path=apps/bookinfo/gcp
             - --git-url=git@github.com:kenthua/anthos-cd-pipeline-env
