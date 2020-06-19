@@ -5,9 +5,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/kenthua/anthos-cd-pipeline'
-    path: apps/bookinfo/overlays/gcp
-    targetRevision: gcp
+    repoURL: 'https://github.com/kenthua/anthos-cd-pipeline-env'
+    path: apps/bookinfo/gcp
+    targetRevision: main
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: default
