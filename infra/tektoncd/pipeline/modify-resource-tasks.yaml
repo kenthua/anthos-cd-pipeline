@@ -1,0 +1,167 @@
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: update-host
+  label:
+    name: update-host
+spec:
+  workspaces:
+  - name: shared-workspace
+  resources:
+    inputs:
+    - name: repo
+      type: git
+  params:
+  - name: virtualservice-host
+    type: string
+  - name: gateway-host
+    type: string
+  - name: app
+    type: string
+  steps:
+  - name: update-gateway
+    image: golang:1.14-alpine
+    command:
+    - sed
+    args:
+    - -i
+    - "s/*/$(inputs.params.gateway-host)/"
+    - /workspace/repo/apps/$(inputs.params.app)/overlays/gcp/$(inputs.params.app)-gateway-patch.yaml
+  - name: update-virtualservice
+    image: golang:1.14-alpine
+    command:
+    - sed
+    args:
+    - -i
+    - "s/*/$(inputs.params.virtualservice-host)/"
+    - /workspace/repo/apps/$(inputs.params.app)/overlays/gcp/$(inputs.params.app)-vs-patch.yaml
+  - name: copy-to-shared-space
+    image: golang:1.14-alpine
+    command:
+    - cp
+    args:
+    - -R
+    - /workspace/repo/apps/$(inputs.params.app) 
+    - $(workspaces.shared-workspace.path)
+  - name: show-in-new
+    image: golang:1.14-alpine
+    command:
+    - cat
+    args:
+    - $(workspaces.shared-workspace.path)/$(inputs.params.app)/overlays/gcp/$(inputs.params.app)-vs-patch.yaml
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hydrate-manifest
+  label:
+    name: hydrate-manifest
+spec:
+  workspaces:
+  - name: shared-workspace
+  params:
+  - name: app
+    type: string
+  - name: env
+    type: string
+  steps:
+  - name: build
+    image: gcr.io/kenthua-sharing/kustomize
+    script: |
+      #!/usr/bin/env sh
+      set -euxo pipefail
+      cd $(workspaces.shared-workspace.path)/$(inputs.params.app)/overlays/$(inputs.params.env)
+      kustomize build > $(workspaces.shared-workspace.path)/$(inputs.params.env).yaml
+  - name: show-in-new
+    image: golang:1.14-alpine
+    command:
+    - cat
+    args:
+    - $(workspaces.shared-workspace.path)/gcp.yaml
+---
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: push
+  label:
+    name: push
+spec:
+  workspaces:
+  - name: shared-workspace
+  resources:
+    inputs:
+    - name: repo-env
+      type: git
+  params:
+  - name: app
+    type: string
+  - name: git-user-name
+    type: string
+  - name: git-user-email
+    type: string
+  - name: git-branch
+    type: string
+  - name: env
+    type: string
+  steps:
+  - name: create-path
+    image: gcr.io/kenthua-sharing/kustomize
+    script: |
+      #!/usr/bin/env sh
+      set -euxo pipefail
+      mkdir -p /workspace/repo-env/apps/$(inputs.params.app)/$(inputs.params.env)
+  - name: copy-to-repo
+    image: golang:1.14-alpine
+    command:
+    - cp
+    args:
+    - -R
+    - $(workspaces.shared-workspace.path)/$(inputs.params.env).yaml
+    - /workspace/repo-env/apps/$(inputs.params.app)/$(inputs.params.env)
+  - name: push
+    image: gcr.io/cloud-builders/git
+    script: |
+      #!/usr/bin/env bash
+      set -euxo pipefail
+      ln -s /tekton/home/.ssh /root/.ssh
+      cd /workspace/repo-env
+      git config user.email "$(inputs.params.git-user-email)"
+      git config user.name "$(inputs.params.git-user-name)"
+      git checkout -b $(inputs.params.git-branch)
+      git add /workspace/repo-env/apps/$(inputs.params.app)/$(inputs.params.env)/$(inputs.params.env).yaml
+      git commit -m 'tekton pipeline'
+      git push origin $(inputs.params.git-branch) --force
+---
+# apiVersion: tekton.dev/v1beta1
+# kind: TaskRun
+# metadata:
+#   name: modify-resource
+#   labels:
+#     name: modify-resource
+# spec:
+#   serviceAccountName: robot-git-ssh
+#   workspaces:
+#   - name: shared-workspace
+#     persistentVolumeClaim:
+#       claimName: shared-task-storage
+#   taskRef:
+#     name: update-host
+#   params:
+#   - name: gateway-host
+#     value: "*.apps.standalone.kenthua.joonix.net"
+#   - name: virtualservice-host
+#     value: "bookinfo.apps.standalone.kenthua.joonix.net"
+#   - name: app
+#     value: bookinfo
+#   - name: git-user-name
+#     value: "name here"
+#   - name: git-user-email
+#     value: "email here"
+#   - name: git-branch
+#     value: gcp
+#   resources:
+#     inputs:
+#     - name: repo
+#       resourceRef:
+#         name: git-pipeline-resource

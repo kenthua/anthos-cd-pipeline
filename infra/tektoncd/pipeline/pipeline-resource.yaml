@@ -1,0 +1,24 @@
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-pipeline-resource
+spec:
+  type: git
+  params:
+    - name: url
+      value: https://github.com/kenthua/anthos-cd-pipeline
+    - name: revision
+      value: master
+---
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: git-pipeline-env-resource
+spec:
+  type: git
+  params:
+    - name: url
+      value: git@github.com:kenthua/anthos-cd-pipeline-env
+    - name: revision
+      value: main    

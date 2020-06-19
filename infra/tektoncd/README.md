@@ -6,15 +6,15 @@ Deploy Tekton pipelines resources into your cluster as describe in the [document
 kubectl apply --filename https://storage.googleapis.com/tekton-releases/pipeline/latest/release.yaml
 ```
 
-A sample pipeline has been created to change the manifests for the bookinfo resource.  Essentially "*" into desired entries.  Once changed, it will push it into your repo in the `gcp` branch.
+A sample pipeline has been created to change the manifests for the bookinfo resource.  Essentially "*" into desired entries.  Once changed, it will push it into an `-env` repo with the hydrated manifest.
 
-- You will need to fork this repo and create deploy key with write access to your environment.
+- You will need to fork this repo and create deploy key with write access to your environment repo.  If your base repo is also private you will need a key for it too, using `git-ssh` as the secret.
 
     ```shell
     apiVersion: v1
     kind: Secret
     metadata:
-    name: git-ssh
+    name: git-ssh-env
     annotations:
         tekton.dev/git-0: github.com
     type: kubernetes.io/ssh-auth
@@ -27,15 +27,19 @@ A sample pipeline has been created to change the manifests for the bookinfo reso
     known_hosts: Z2l0aHViLmNvbSBzc2gtcnNhIEFBQUFCM056YUMxeWMyRUFBQUFCSXdBQUFRRUFxMkE3aFJHbWRubTl0VURiTzlJRFN3Qks2VGJRYStQWFlQQ1B5NnJiVHJUdHc3UEhrY2NLcnBwMHlWaHA1SGRFSWNLcjZwTGxWREJmT0xYOVFVc3lDT1Ywd3pmaklKTmxHRVlzZGxMSml6SGhibjJtVWp2U0FIUXFaRVRZUDgxZUZ6TFFOblBIdDRFVlZVaDdWZkRFU1U4NEtlem1ENVFsV3BYTG12VTMxL3lNZitTZTh4aEhUdktTQ1pJRkltV3dvRzZtYlVvV2Y5bnpwSW9hU2pCK3dlcXFVVW1wYWFhc1hWYWw3MkorVVgyQisyUlBXM1JjVDBlT3pRZ3FsSkwzUktyVEp2ZHNqRTNKRUF2R3EzbEdIU1pYeTI4RzNza3VhMlNtVmkvdzR5Q0U2Z2JPRHFuVFdsZzcrd0M2MDR5ZEdYQThWSmlTNWFwNDNKWGlVRkZBYVE9PQo=
     ```
 
-- Then apply `pipeline/robot-git-ssh-sa.yaml`
+- Then apply the pipeline depependent resources
 
     ```shell
     kubectl create -f robot-git-ssh-sa.yaml
+    kubectl create -f workspace-storage.yaml
+    kubectl create -f modify-resource-task.yaml
     ```
 
-- Modify TaskRun input params and git-pipeline-resource with your repo information in `modify-resource-taskrun.yaml`.
-- Then create the TaskRun in your cluster
+- Modify `PipelineRun` input params in `pipeline.yaml`
+- Modify git repo information in `pipeline-resource.yaml`
+- Then create the remainder pipeline resources in your cluster
 
     ```shell
-    kubectl create -f modify-resource-taskrun.yaml
+    kubectl create -f pipeline-resource.yaml -n test
+    kubectl create -f pipeline.yaml -n test
     ```

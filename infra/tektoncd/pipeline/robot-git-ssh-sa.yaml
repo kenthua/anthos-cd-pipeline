@@ -4,3 +4,10 @@ metadata:
   name: robot-git-ssh
 secrets:
 - name: git-ssh
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: robot-git-env-ssh
+secrets:
+- name: git-ssh-env
