@@ -21,7 +21,7 @@ spec:
     type: string
   steps:
   - name: update-gateway
-    image: golang:1.14-alpine
+    image: golang:1.14.4-alpine
     command:
     - sed
     args:
@@ -29,7 +29,7 @@ spec:
     - "s/*/$(inputs.params.gateway-host)/"
     - /workspace/repo/apps/$(inputs.params.app)/overlays/gcp/$(inputs.params.app)-gateway-patch.yaml
   - name: update-virtualservice
-    image: golang:1.14-alpine
+    image: golang:1.14.4-alpine
     command:
     - sed
     args:
@@ -37,19 +37,13 @@ spec:
     - "s/*/$(inputs.params.virtualservice-host)/"
     - /workspace/repo/apps/$(inputs.params.app)/overlays/gcp/$(inputs.params.app)-vs-patch.yaml
   - name: copy-to-shared-space
-    image: golang:1.14-alpine
+    image: golang:1.14.4-alpine
     command:
     - cp
     args:
     - -R
     - /workspace/repo/apps/$(inputs.params.app) 
     - $(workspaces.shared-workspace.path)
-  - name: show-in-new
-    image: golang:1.14-alpine
-    command:
-    - cat
-    args:
-    - $(workspaces.shared-workspace.path)/$(inputs.params.app)/overlays/gcp/$(inputs.params.app)-vs-patch.yaml
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -66,19 +60,13 @@ spec:
   - name: env
     type: string
   steps:
-  - name: build
+  - name: hydrate
     image: gcr.io/kenthua-sharing/kustomize
     script: |
       #!/usr/bin/env sh
       set -euxo pipefail
       cd $(workspaces.shared-workspace.path)/$(inputs.params.app)/overlays/$(inputs.params.env)
       kustomize build > $(workspaces.shared-workspace.path)/$(inputs.params.env).yaml
-  - name: show-in-new
-    image: golang:1.14-alpine
-    command:
-    - cat
-    args:
-    - $(workspaces.shared-workspace.path)/gcp.yaml
 ---
 apiVersion: tekton.dev/v1beta1
 kind: Task
@@ -112,7 +100,7 @@ spec:
       set -euxo pipefail
       mkdir -p /workspace/repo-env/apps/$(inputs.params.app)/$(inputs.params.env)
   - name: copy-to-repo
-    image: golang:1.14-alpine
+    image: golang:1.14.4-alpine
     command:
     - cp
     args:
@@ -133,35 +121,3 @@ spec:
       git commit -m 'tekton pipeline'
       git push origin $(inputs.params.git-branch) --force
 ---
-# apiVersion: tekton.dev/v1beta1
-# kind: TaskRun
-# metadata:
-#   name: modify-resource
-#   labels:
-#     name: modify-resource
-# spec:
-#   serviceAccountName: robot-git-ssh
-#   workspaces:
-#   - name: shared-workspace
-#     persistentVolumeClaim:
-#       claimName: shared-task-storage
-#   taskRef:
-#     name: update-host
-#   params:
-#   - name: gateway-host
-#     value: "*.apps.standalone.kenthua.joonix.net"
-#   - name: virtualservice-host
-#     value: "bookinfo.apps.standalone.kenthua.joonix.net"
-#   - name: app
-#     value: bookinfo
-#   - name: git-user-name
-#     value: "name here"
-#   - name: git-user-email
-#     value: "email here"
-#   - name: git-branch
-#     value: gcp
-#   resources:
-#     inputs:
-#     - name: repo
-#       resourceRef:
-#         name: git-pipeline-resource
