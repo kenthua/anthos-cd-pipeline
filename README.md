@@ -1,3 +1,5 @@
+![Lint Code Base](https://github.com/kenthua/anthos-cd-pipeline/workflows/Lint%20Code%20Base/badge.svg)
+
 # Automated Pipeline for Sample Applications
 
 ## Sample Apps
