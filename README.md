@@ -27,7 +27,7 @@ Fluxcd is configured in `infra` to automatically pipeline deploy `bookinfo`.
 Tektoncd is configured in `infra` to run a PipelineRun which modifies the gateway and virtualservice of `bookinfo` and sync it to `anthos-cd-pipeline-env` repo `main` branch.  The `-env` repo is referenced by both argocd and fluxcd.
 
 ## Multi-cluster deployment, based on [istio replicated control planes](https://istio.io/docs/setup/install/multicluster/gateways/)
-> NOTE: Tested with ASM binary 1.5.4, 1.5.5 (see `istio-1.5` tag), 1.6.4
+> NOTE: Tested with ASM binary 1.5.x (see `istio-1.5` tag), 1.6.4, 1.6.5
 - Istio
   - Setup shared istio certificates
 
