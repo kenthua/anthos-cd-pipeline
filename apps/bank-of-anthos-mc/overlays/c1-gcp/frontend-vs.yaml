@@ -9,7 +9,8 @@ spec:
   - frontend-gateway
   http:
   - match:
-    - path: "/"
+    - uri:
+        prefix: "/"
     route:
     - destination:
         host: frontend
