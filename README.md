@@ -50,10 +50,10 @@ Tektoncd is configured in `infra` to run a PipelineRun which modifies the gatewa
     #   Each deployment service account will need the iam policy binding to namespace/KSA
     #   Each KSA will need to be annotated with the GSA
     #   See below under workload identity section
-    istioctl manifest apply -f istio-mc.yaml
+    istioctl install -f istio-mc.yaml
 
     # cluster 2 (aws) in infra/istio
-    istioctl manifest apply -f istio-mc-aws.yaml
+    istioctl install -f istio-mc-aws.yaml
     ```
 
   - Setup DNS (per instructions)
