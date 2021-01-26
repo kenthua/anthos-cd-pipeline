@@ -3,5 +3,5 @@ kind: Namespace
 metadata:
   labels:
     owner: "pipeline"
-    istio-injection: "enabled"
+    istio.io/rev: "asm-181-5"
   name: bookinfo
